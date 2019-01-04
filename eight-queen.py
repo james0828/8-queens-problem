@@ -15,11 +15,12 @@ except:
 
 num = input('how many queens would you want?')
 
+origin_queen = []
 for i in range(0, int(num)):
     temp = input('queen:')
     try:
         t = temp.split(',')
-        print(t)
+        origin_queen.append((int(t[0]), int(t[1])))
         matrix[int(t[0])][int(t[1])] = 'Q'
     except:
         sys.exit('format error or your index is over the chestboard')
@@ -48,26 +49,66 @@ max_cell = []
 # inspect whether the cell can put Queen
 
 def inspect_matrix(i, j, power, matrix):
-    judge = True
+    judge = True # judge whether the cell can be Queen
+    run = [True for n in range(8)] # judge whetehr the direction should be run
+    temp = [0 for n in range(8)] # tempitively save the inspect console
+    barrier_cell = [None for n in range(8)] # save the cell about the barrier
+    has_barrier = [False for n in range(8)]
 
     for x in range(1, power + 1):
-        if inspect_cell(i - x, j, matrix) or inspect_cell(i + x, j, matrix) or inspect_cell(i, j + x, matrix) or inspect_cell(i, j - x, matrix)\
-            or inspect_cell(i + x, j + x, matrix) or inspect_cell(i + x, j - x, matrix) or inspect_cell(i - x, j + x, matrix) or inspect_cell(i - x, j - x, matrix):
+        if run[0]:
+            temp[0] = inspect_cell(i - x, j, matrix, has_barrier[0])
+        if run[1]:
+            temp[1] = inspect_cell(i + x, j, matrix, has_barrier[1])
+        if run[2]:
+            temp[2] = inspect_cell(i, j + x, matrix, has_barrier[2])
+        if run[3]:
+            temp[3] = inspect_cell(i, j - x, matrix, has_barrier[3])
+        if run[4]:
+            temp[4] = inspect_cell(i + x, j + x, matrix, has_barrier[4])
+        if run[5]:
+            temp[5] = inspect_cell(i + x, j - x, matrix, has_barrier[5])
+        if run[6]:
+            temp[6] = inspect_cell(i - x, j + x, matrix, has_barrier[6])
+        if run[7]:
+            temp[7] = inspect_cell(i - x, j - x, matrix, has_barrier[7])
+
+        if temp[0] == 0 or temp[1] == 0 or temp[2] == 0 or temp[3] == 0 or temp[4] == 0 or temp[5] == 0 or temp[6] == 0 or temp[7] == 0:
             judge = False
             break
 
-    return judge
+        for t in range(8):
+            if temp[t] == 1:
+                temp[t] = False
+                run[t] = False
+                if barrier_cell[t] != None:
+                    barrier_cell[t] = (barrier_cell[t][0], True)
+            elif type(temp[t]) == tuple:
+                has_barrier[t] = True
+                barrier_cell[t] = (temp[t], False)
 
-# inspect whether the cell is Queen
+    if judge:
+        return barrier_cell
+    else:
+        return False
 
-def inspect_cell(i,j, matrix):
+# inspect the cell of (i, j)
+
+def inspect_cell(i, j, matrix, has_barrier):
     global height
     global width
 
-    if i < height and j < width and matrix[i][j] == 'Q':
-        return True
+    if i < height and j < width and i >= 0 and j >= 0:
+        if has_barrier:
+            if matrix[i][j] == 'Q':
+                return 1
+        else:
+            if matrix[i][j] == 'Q':
+                return 0
+            elif matrix[i][j] == 'B':
+                return (i, j)
 
-    return False                 
+    return 3
 
 # depth-first-search implement for advanced n-queen problem
 
@@ -77,9 +118,17 @@ def dfs(i, j, power, matrix, num):
     global max_num
     global max_cell
 
-    if matrix[i][j] == 'O' and inspect_matrix(i, j, power, matrix):
-        matrix[i][j] = 'Q'
-        dfs(i, j, power, matrix[:], num + 1)
+    consoles = inspect_matrix(i, j, power, matrix)
+
+    if matrix[i][j] == 'O' and type(consoles) == list:
+        clone_matrix = matrix[:]
+        clone_matrix[i][j] = 'Q'
+
+        for console in consoles:
+            if type(console) == tuple and console[1]:
+                clone_matrix[console[0][0]][console[0][1]] = 'X'
+
+        dfs(i, j, power, clone_matrix, num + 1)
     if i == height - 1 and j == width - 1:
         if max_num < num:
             max_num = num
@@ -90,3 +139,15 @@ def dfs(i, j, power, matrix, num):
         dfs(i, j + 1, power, matrix, num)
 
 dfs(0, 0, power, matrix, 0)
+
+result_queen = []
+print('max: ' + str(max_num))
+for m, i in enumerate(max_cell):
+    print(i)
+    for n, j in enumerate(i):
+        if j == 'Q':
+            if (m, n) not in origin_queen:
+                result_queen.append((m, n))
+
+for result in result_queen:
+    print(result)
