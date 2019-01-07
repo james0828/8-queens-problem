@@ -1,7 +1,8 @@
 import sys
 
-# deal with input about height and width
+sys.setrecursionlimit(1000000)
 
+# deal with input about height and width
 try:
     height = int(input('height:'))
     width = int(input('width:'))
