@@ -1,51 +1,38 @@
 import sys
 import copy
+import re
 
 sys.setrecursionlimit(1000000)
 
-# deal with input about height and width
-try:
-    height = int(input('height:'))
-    width = int(input('width:'))
-    # use matrix to save the chestboard 0 means the blank cell, 1 means the queen, 2 means the barrier
-
-    matrix = [['O' for n in range(0, width)] for n in range(0, height)]
-except:
-    sys.exit('format about height or width is wrong')
-
-# deal with input about the queens which are existed
-
-num = input('how many queens would you want?')
-
 origin_queen = []
-for i in range(0, int(num)):
-    temp = input('queen:')
-    try:
-        t = temp.split(',')
-        origin_queen.append((int(t[0]), int(t[1])))
-        matrix[int(t[0])][int(t[1])] = 'Q'
-    except:
-        sys.exit('format error or your index is over the chestboard')
-
-# deal with input about the barriers which are existed
-
-num = input('how many barrier would you want?')
-
 barriers = []
-for i in range(0, int(num)):
-    temp = input('barrier:')
-    try:
+power = None
+
+f = open(sys.argv[1], 'r')
+for i in f:
+    if re.match(r"height:+", i):
+        height = int(i.split(':')[1])
+    if re.match(r"width:+", i):
+        width = int(i.split(':')[1])
+    if re.match(r"queen:+", i):
+        temp = i.split(':')[1]
         t = temp.split(',')
-        barriers.append(t)
-        matrix[int(t[0])][int(t[1])] = 'B'
-    except:
-        sys.exit('format error or your index is over the chestboard')
+        origin_queen.append((int(t[0])-1, int(t[1])-1))
+    if re.match(r"barrier:+", i):
+        temp = i.split(':')[1]
+        t = temp.split(',')
+        barriers.append((int(t[0])-1, int(t[1])-1))
+    if re.match(r"power:+", i):
+        power = int(i.split(':')[1])
 
-# deal with input about power
+if power is None:
+    power = max(height, width)
 
-power = int(input('power: '))
-
-# deal with the cells in matrix
+matrix = [['O' for n in range(0, height)] for k in range(0, width)]
+for i in origin_queen:
+    matrix[i[0]][i[1]] = 'Q'
+for i in barriers:
+    matrix[i[0]][i[1]] = 'B'
 
 max_num = 0
 max_cell = []
@@ -214,7 +201,7 @@ def get_pattern(x, y, pattern):
         elif (first_num != 0 and second_num != 0 and first_num == second_num and first_num <= power):
             key = True
             for barrier in barriers:
-                if max(i[0], x) > barrier[0] and min(i[0], jx) < barrier[0] and max(i[1], y) > barrier[1] and min(i[1], y) < barrier[1] and (barrier[0] - i[0]) % (barrier[1] - i[1]) == 0:
+                if max(i[0], x) > barrier[0] and min(i[0], x) < barrier[0] and max(i[1], y) > barrier[1] and min(i[1], y) < barrier[1] and (barrier[0] - i[0]) % (barrier[1] - i[1]) == 0:
                     key = False
         if key:
             temp_pattern.remove(i)
@@ -224,7 +211,7 @@ def can_put(i, j, matrix):
     global height
     global width
 
-    if i < 0 or i >= height or j < 0 or j >= width or matrix[i][j] == 'B':
+    if i < 0 or i >= width or j < 0 or j >= height or matrix[i][j] == 'B':
         return 0
     if matrix[i][j] == 'Q':
         return 1
@@ -252,11 +239,10 @@ dfs(matrix, 0, s[0], s[1])
 result_queen = []
 print('max: ' + str(max_num))
 for m, i in enumerate(max_cell):
-    print(i)
     for n, j in enumerate(i):
         if j == 'Q':
             if (m, n) not in origin_queen:
                 result_queen.append((m, n))
 
 for result in result_queen:
-    print(result)
+    print('queen: ' + str(result[0] + 1) + ',' + str(result[1] + 1))
