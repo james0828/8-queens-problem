@@ -48,6 +48,54 @@ power = int(input('power: '))
 max_num = 0
 max_cell = []
 
+def count_runnable(power, matrix):
+    global height
+    global width
+    count = 0
+    console = []
+    for i, s in enumerate(matrix):
+        for j, m in enumerate(s):
+            for m in range(1, power + 1):
+                if can_put(i + m, j, matrix):
+                    count += 1
+                if can_put(i - m, j, matrix):
+                    count += 1
+                if can_put(i, j + m, matrix):
+                    count += 1
+                if can_put(i, j - m, matrix):
+                    count += 1
+                if can_put(i + m, j + m, matrix):
+                    count += 1
+                if can_put(i - m, j - m, matrix):
+                    count += 1
+                if can_put(i - m, j + m, matrix):
+                    count += 1
+                if can_put(i + m, j - m, matrix):
+                    count += 1
+                
+            print('count ' + str(count))
+            
+            if i == 0 and j == 0:
+                minimum = count
+                console.append([i, j])
+            elif minimum > count:
+                minimum = count
+                console = []
+                console.append([i, j])
+            elif minimum == count:
+                console.append([i, j])
+
+            count = 0
+    return console
+
+def can_put(i, j, matrix):
+    global height
+    global width
+
+    if i < 0 or i >= height or j < 0 or j >= width:
+        return False
+
+    return matrix[i][j] == 'O'
 # inspect whether the cell can put Queen
 
 def inspect_matrix(i, j, power, matrix):
@@ -89,10 +137,6 @@ def inspect_matrix(i, j, power, matrix):
                 has_barrier[t] = True
                 barrier_cell[t] = (temp[t], False)
 
-    # if judge:
-    #     return barrier_cell
-    # else:
-    #     return False
     return judge
 
 # inspect the cell of (i, j)
@@ -135,6 +179,7 @@ def dfs(i, j, power, matrix, num):
     else:
         dfs(i, j + 1, power, matrix, num)
 
+print(count_runnable(power, matrix))
 dfs(0, 0, power, matrix, 0)
 
 result_queen = []
