@@ -1,4 +1,5 @@
 import sys
+import copy
 
 sys.setrecursionlimit(1000000)
 
@@ -88,10 +89,11 @@ def inspect_matrix(i, j, power, matrix):
                 has_barrier[t] = True
                 barrier_cell[t] = (temp[t], False)
 
-    if judge:
-        return barrier_cell
-    else:
-        return False
+    # if judge:
+    #     return barrier_cell
+    # else:
+    #     return False
+    return judge
 
 # inspect the cell of (i, j)
 
@@ -119,15 +121,9 @@ def dfs(i, j, power, matrix, num):
     global max_num
     global max_cell
 
-    consoles = inspect_matrix(i, j, power, matrix)
-
-    if matrix[i][j] == 'O' and type(consoles) == list:
-        clone_matrix = matrix[:]
+    if matrix[i][j] == 'O' and inspect_matrix(i, j, power, matrix):
+        clone_matrix = copy.deepcopy(matrix)
         clone_matrix[i][j] = 'Q'
-
-        for console in consoles:
-            if type(console) == tuple and console[1]:
-                clone_matrix[console[0][0]][console[0][1]] = 'X'
 
         dfs(i, j, power, clone_matrix, num + 1)
     if i == height - 1 and j == width - 1:
