@@ -10,19 +10,19 @@ power = None
 
 f = open(sys.argv[1], 'r')
 for i in f:
-    if re.match(r"height:+", i):
+    if re.match(r"height+", i):
         height = int(i.split(':')[1])
-    if re.match(r"width:+", i):
+    if re.match(r"width+", i):
         width = int(i.split(':')[1])
-    if re.match(r"queen:+", i):
+    if re.match(r"queen+", i):
         temp = i.split(':')[1]
         t = temp.split(',')
         origin_queen.append((int(t[0])-1, int(t[1])-1))
-    if re.match(r"barrier:+", i):
+    if re.match(r"barrier+", i):
         temp = i.split(':')[1]
         t = temp.split(',')
         barriers.append((int(t[0])-1, int(t[1])-1))
-    if re.match(r"power:+", i):
+    if re.match(r"power+", i):
         power = int(i.split(':')[1])
 
 if power is None:

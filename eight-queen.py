@@ -9,7 +9,7 @@ try:
     width = int(input('width:'))
     # use matrix to save the chestboard 0 means the blank cell, 1 means the queen, 2 means the barrier
 
-    matrix = [['O' for n in range(0, width)] for n in range(0, height)]
+    matrix = [['O' for n in range(0, height)] for n in range(0, width)]
 except:
     sys.exit('format about height or width is wrong')
 
@@ -92,7 +92,7 @@ def can_put(i, j, matrix):
     global height
     global width
 
-    if i < 0 or i >= height or j < 0 or j >= width:
+    if i < 0 or i >= width or j < 0 or j >= height:
         return False
 
     return matrix[i][j] == 'O'
@@ -145,7 +145,7 @@ def inspect_cell(i, j, matrix, has_barrier):
     global height
     global width
 
-    if i < height and j < width and i >= 0 and j >= 0:
+    if i < width and j < height and i >= 0 and j >= 0:
         if has_barrier:
             if matrix[i][j] == 'Q':
                 return 1
@@ -170,11 +170,11 @@ def dfs(i, j, power, matrix, num):
         clone_matrix[i][j] = 'Q'
 
         dfs(i, j, power, clone_matrix, num + 1)
-    if i == height - 1 and j == width - 1:
+    if i == width - 1 and j == height - 1:
         if max_num < num:
             max_num = num
             max_cell = matrix
-    elif j == width -1:
+    elif j == height -1:
         dfs(i + 1, 0, power, matrix, num)
     else:
         dfs(i, j + 1, power, matrix, num)

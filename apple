@@ -1,0 +1,9 @@
+height : 5
+width : 7
+queen : 1,2
+queen : 3,1
+queen : 4,5
+queen : 6,4
+barrier : 2,3
+barrier : 5,2
+power : 2
